@@ -1,38 +1,48 @@
-import axios from 'axios';
+console.log('start');
+const base_url = 'https://api.thecatapi.com/v1/breeds';
+const breed_url = 'https://api.thecatapi.com/v1/images/search';
 
-axios.defaults.headers.common['x-api-key'] =
-  'live_zHFebZByr5MT95LL79HO8n98KLXjkHMmP1yvgYlPDH5xs1LuljJJtWZCJqZ4WUZV';
-
-export async function fetchBreeds() {
+export function fetchBreeds() {
   console.log('Fetching breeds...');
-  const response = await axios.get('https://api.thecatapi.com/v1/breeds');
-  console.log('Got response:', response);
-  if (!response.ok) {
-    console.error('Error fetching breeds:', response.status);
-    throw new Error(response.status);
-  }
-  console.log('Successfully fetched breeds:', response.data);
-  return response.data;
+  return fetch(base_url)
+    .then(response => {
+      console.log('Got response:', response);
+      if (!response.ok) {
+        throw new Error(response.status);
+      }
+      return response.json();
+    })
+    .then(breeds => {
+      console.log('Successfully fetched breeds:', breeds);
+      return breeds;
+    })
+    .catch(error => {
+      console.error('Error fetching breeds:', error);
+      throw error;
+    });
 }
 
-// -export function fetchBreeds() {
-// -  return axios.fetch('https://api.thecatapi.com/v1/breeds').then(response => {
-// -    if (response.ok) throw new Error(response.status);
-// -    return response.json();
-// -  });
-
-// export async function fetchCatByBreed(breedId) {
-//   try {
-//     const response = await axios.get(
-//       'https://api.thecatapi.com/v1/images/search',
-//       {
-//         params: {
-//           breed_ids: breedId,
-//         },
-//       }
-//     );
-//     return response.data;
-//   } catch (error) {
-//     console.error(error);
-//   }
-// }
+export function fetchCatByBreed(breedId) {
+  console.log('Entering fetchCatByBreed');
+  console.log('Fetching cat by breed...');
+  console.log(`Fetching url: ${breed_url}?breed_ids=${breedId}`);
+  return fetch(`${breed_url}?breed_ids=${breedId}`)
+    .then(response => {
+      console.log('Got response:', response);
+      if (!response.ok) {
+        throw new Error(response.status);
+      }
+      return response.json();
+    })
+    .then(cat => {
+      console.log('Successfully fetched cat:', cat);
+      return cat;
+    })
+    .catch(error => {
+      console.error('Error fetching cat:', error);
+      throw error;
+    })
+    .finally(() => {
+      console.log('Exiting fetchCatByBreed');
+    });
+}

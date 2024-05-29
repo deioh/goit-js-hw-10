@@ -1,21 +1,30 @@
-const base_url = 'https://api.thecatapi.com/v1/breeds';
+import { fetchBreeds, fetchCatByBreed } from './cat-api';
 
-export function fetchBreeds() {
-  console.log('Fetching breeds...');
-  return fetch(base_url)
-    .then(response => {
-      console.log('Got response:', response);
-      if (!response.ok) {
-        throw new Error(response.status);
-      }
-      return response.json();
-    })
-    .then(breeds => {
-      console.log('Successfully fetched breeds:', breeds);
-      return breeds;
-    })
-    .catch(error => {
-      console.error('Error fetching breeds:', error);
-      throw error;
-    });
-}
+const breedSelect = document.querySelector('.breed-select');
+
+breedSelect.addEventListener('change', event => {
+  console.log('Change event occurred');
+  const breedId = event.target.value;
+  console.log(`Selected breed ID: ${breedId}`);
+  fetchCatByBreed(breedId);
+});
+
+console.log('Starting fetchBreeds...');
+fetchBreeds()
+  .then(breeds => {
+    console.log(`fetchBreeds successful. Received ${breeds.length} breeds`);
+    const options = breeds
+      .map(breed => {
+        const option = document.createElement('option');
+        option.value = breed.id;
+        option.textContent = breed.name;
+        return option;
+      })
+      .forEach(option => {
+        console.log(`Appending option ${option.textContent} (${option.value})`);
+        breedSelect.appendChild(option);
+      });
+  })
+  .catch(error => {
+    console.error('Error fetchingBreeds:', error);
+  });
